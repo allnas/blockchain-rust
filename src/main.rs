@@ -3,15 +3,20 @@ extern crate chrono;
 
 pub mod entity;
 pub mod socket;
+pub mod util;
 
 use crate::entity::block::Block;
 use crate::entity::transaction::Transaction;
+use crate::util::sqlutils::connect;
+use crate::util::sqlutils::init_table;
+use crate::util::sqlutils::save_block;
+use crate::util::sqlutils::search;
 
 use crypto::sha3::Sha3;
 use crypto::digest::Digest;
 
 use rustc_serialize::json;
-
+use std::borrow::BorrowMut;
 
 
 fn first_block() -> String {
@@ -88,25 +93,17 @@ fn next_block(hash_json: String) -> String {
 }
 
 fn main() {
+    let mut conn = connect();
+    init_table(conn.borrow_mut());
 
     let hash_json = first_block();
-    println!("{}", hash_json);
+    save_block(conn.borrow_mut(), 1, &hash_json);
 
     let hash_json = next_block(hash_json);
-    println!("{}", hash_json);
+    save_block(conn.borrow_mut(), 2, &hash_json);
 
     let hash_json = next_block(hash_json);
-    println!("{}", hash_json);
+    save_block(conn.borrow_mut(), 3, &hash_json);
 
-    let hash_json = next_block(hash_json);
-    println!("{}", hash_json);
-
-    let hash_json = next_block(hash_json);
-    println!("{}", hash_json);
-
-    let hash_json = next_block(hash_json);
-    println!("{}", hash_json);
-    
-    let hash_json = next_block(hash_json);
-    println!("{}", hash_json);
+    search(conn.borrow_mut(),2);
 }
