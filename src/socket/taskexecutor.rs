@@ -22,4 +22,3 @@ pub fn send_task(){
     // 等待新建线程执行完成
     new_thread.join().unwrap();
 }
->>>>>>> Stashed changes

@@ -16,13 +16,7 @@ use crypto::sha3::Sha3;
 use crypto::digest::Digest;
 
 use rustc_serialize::json;
-<<<<<<< Updated upstream
 use std::borrow::BorrowMut;
-=======
-
-use crate::socket::taskexecutor;
->>>>>>> Stashed changes
-
 
 fn first_block() -> String {
 
@@ -110,5 +104,5 @@ fn main() {
     let hash_json = next_block(hash_json);
     save_block(conn.borrow_mut(), 3, &hash_json);
 
-    search(conn.borrow_mut(),2);
+    search(conn.borrow_mut(),0);
 }
