@@ -2,6 +2,7 @@ extern crate crypto;
 extern crate chrono;
 
 pub mod entity;
+pub mod socket;
 
 use crate::entity::block::Block;
 use crate::entity::transaction::Transaction;
@@ -11,7 +12,10 @@ use crypto::digest::Digest;
 
 use rustc_serialize::json;
 
+
+
 fn first_block() -> String {
+
     let mut transactions = Vec::new();
     transactions.push(Transaction { id: 1, info: "这是创世区块".to_string() });
     transactions.push(Transaction { id: 2, info: "区块链高度为：1".to_string() });
@@ -84,6 +88,7 @@ fn next_block(hash_json: String) -> String {
 }
 
 fn main() {
+
     let hash_json = first_block();
     println!("{}", hash_json);
 
