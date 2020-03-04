@@ -95,13 +95,13 @@ fn main() {
     let mut conn = connect();
     init_table(conn.borrow_mut());
 
-    let hash_json = first_block();
+    let mut hash_json = first_block();
     save_block(conn.borrow_mut(), 1, &hash_json);
 
-    let hash_json = next_block(hash_json);
+    hash_json = next_block(hash_json);
     save_block(conn.borrow_mut(), 2, &hash_json);
 
-    let hash_json = next_block(hash_json);
+    hash_json = next_block(hash_json);
     save_block(conn.borrow_mut(), 3, &hash_json);
 
     search(conn.borrow_mut(),0);
