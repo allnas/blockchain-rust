@@ -101,4 +101,7 @@ fn main() {
 
     let hash_json = next_block(hash_json);
     println!("{}", hash_json);
+    
+    let hash_json = next_block(hash_json);
+    println!("{}", hash_json);
 }
