@@ -11,15 +11,16 @@ use crate::util::sqlutils::connect;
 use crate::util::sqlutils::init_table;
 use crate::util::sqlutils::save_block;
 use crate::util::sqlutils::search;
+use crate::util::sqlutils::max_id;
 
 use crypto::sha3::Sha3;
 use crypto::digest::Digest;
 
 use rustc_serialize::json;
 use std::borrow::BorrowMut;
+use sqlite::Connection;
 
 fn first_block() -> String {
-
     let mut transactions = Vec::new();
     transactions.push(Transaction { id: 1, info: "这是创世区块".to_string() });
     transactions.push(Transaction { id: 2, info: "区块链高度为：1".to_string() });
@@ -38,7 +39,7 @@ fn first_block() -> String {
     return json::encode(&block).unwrap();
 }
 
-fn block(previous_hash: String) -> String {
+fn block(previous_hash: String, conn: &mut Connection) -> String {
     let mut transactions = Vec::new();
     transactions.push(Transaction { id: 1, info: "共识机制生成的区块".to_string() });
     transactions.push(Transaction { id: 2, info: "区块链高度为2".to_string() });
@@ -56,7 +57,7 @@ fn block(previous_hash: String) -> String {
     }
 
     let block = Block {
-        index: 1,
+        index: max_id(conn.borrow_mut()),
         hash,
         previous_hash: previous_hash.to_string(),
         timestamp: chrono::prelude::Local::now().timestamp_millis(),
@@ -83,10 +84,10 @@ fn calculate_hash(previous_hash: String, transactions: &mut Vec<Transaction>, no
     return hash;
 }
 
-fn next_block(hash_json: String) -> String {
-    let block_json:Block = json::decode(hash_json.as_ref()).unwrap();
+fn next_block(hash_json: String, conn: &mut Connection) -> String {
+    let block_json: Block = json::decode(hash_json.as_ref()).unwrap();
     let previous_hash = block_json.hash;
-    let hash_json = block(previous_hash);
+    let hash_json = block(previous_hash, conn);
 
     return hash_json;
 }
@@ -98,11 +99,11 @@ fn main() {
     let mut hash_json = first_block();
     save_block(conn.borrow_mut(), 1, &hash_json);
 
-    hash_json = next_block(hash_json);
+    hash_json = next_block(hash_json, conn.borrow_mut());
     save_block(conn.borrow_mut(), 2, &hash_json);
 
-    hash_json = next_block(hash_json);
+    hash_json = next_block(hash_json, conn.borrow_mut());
     save_block(conn.borrow_mut(), 3, &hash_json);
 
-    search(conn.borrow_mut(),0);
+    search(conn.borrow_mut(), 0);
 }

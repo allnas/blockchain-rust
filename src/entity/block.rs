@@ -2,7 +2,7 @@ use crate::entity::transaction::Transaction;
 
 #[derive(RustcDecodable, RustcEncodable)]
 pub struct Block {
-    pub index: i32,
+    pub index: i64,
     pub hash: String,
     pub previous_hash: String,
     pub timestamp: i64,

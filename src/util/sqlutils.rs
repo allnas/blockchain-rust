@@ -35,3 +35,9 @@ pub fn search(connection: &mut Connection, id: i64) {
         println!("json = {}", statement.read::<String>(1).unwrap());
     }
 }
+
+pub fn max_id(connection: &mut Connection) -> i64 {
+    let statement = "SELECT MAX(id)+1 AS id FROM t_block";
+    let mut cursor = connection.prepare(statement).unwrap().cursor();
+    return cursor.next().unwrap().unwrap()[0].as_integer().unwrap();
+}
