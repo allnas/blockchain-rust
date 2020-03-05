@@ -12,7 +12,7 @@ pub fn init_table(connection: &mut Connection) {
              ", ).unwrap();
 }
 
-pub fn save_block(connection: &mut Connection, id: i64, json: &str) {
+pub fn save_block(connection: &mut Connection, id: i64, json: &str) -> bool {
     let mut statement = connection
         .prepare("INSERT INTO t_block VALUES (?, ?)")
         .unwrap();
@@ -20,7 +20,7 @@ pub fn save_block(connection: &mut Connection, id: i64, json: &str) {
     statement.bind(1, id).unwrap();
     statement.bind(2, json).unwrap();
     let stm = statement.next();
-    println!("{}", stm.is_ok());
+    return stm.is_ok();
 }
 
 pub fn search(connection: &mut Connection, id: i64) {

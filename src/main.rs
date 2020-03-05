@@ -97,13 +97,19 @@ fn main() {
     init_table(conn.borrow_mut());
 
     let mut hash_json = first_block();
-    save_block(conn.borrow_mut(), 1, &hash_json);
+    println!("{}", save_block(conn.borrow_mut(), 1, &hash_json));
 
     hash_json = next_block(hash_json, conn.borrow_mut());
-    save_block(conn.borrow_mut(), 2, &hash_json);
+    println!("{}", save_block(conn.borrow_mut(), 2, &hash_json));
 
     hash_json = next_block(hash_json, conn.borrow_mut());
-    save_block(conn.borrow_mut(), 3, &hash_json);
+    println!("{}", save_block(conn.borrow_mut(), 3, &hash_json));
+
+    hash_json = next_block(hash_json, conn.borrow_mut());
+    println!("{}", save_block(conn.borrow_mut(), 4, &hash_json));
+
+    hash_json = next_block(hash_json, conn.borrow_mut());
+    println!("{}", save_block(conn.borrow_mut(), 5, &hash_json));
 
     search(conn.borrow_mut(), 0);
 }
