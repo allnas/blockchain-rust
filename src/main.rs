@@ -17,8 +17,10 @@ use crypto::sha3::Sha3;
 use crypto::digest::Digest;
 
 use rustc_serialize::json;
-use std::borrow::BorrowMut;
-use sqlite::Connection;
+use std::net::{UdpSocket, Ipv4Addr};
+
+use std::io;
+use sqlite::{Connection, State};
 
 fn first_block() -> String {
     let mut transactions = Vec::new();
@@ -93,23 +95,43 @@ fn next_block(hash_json: String, conn: &mut Connection) -> String {
 }
 
 fn main() {
-    let mut conn = connect();
-    init_table(conn.borrow_mut());
+    let mut guess = String::new();
+    io::stdin().read_line(&mut guess).expect("Failed to read line");
+    let mcast_group: Ipv4Addr = "233.0.0.1".parse().unwrap();
+    let port: u16 = 6000;
+    let any = "0.0.0.0".parse().unwrap();
+    let mut buffer = [0u8; 1600];
+    println!("You guessed: {}",guess);
+    if guess.len()> 2 {
+        // client case
+        println!("startclient");
+        let socket = UdpSocket::bind((any, port)).expect("Could not bind client socket");
+        socket.join_multicast_v4(&mcast_group, &any)
+            .expect("Could not join multicast group");
+        socket.recv_from(&mut buffer).expect("Failed to write to server");
+    } else {
+        // server case
+        println!("startserver");
+        let socket = UdpSocket::bind((any, 0))
+            .expect("Could not write buffer as string");
+        socket.send_to("Hello, world!".as_bytes(), &(mcast_group, port)).expect("Failed to write data");
+    }
+    // let pool = ThreadPool::new(2);
+    // pool.execute(|| two());
 
-    let mut hash_json = first_block();
-    println!("{}", save_block(conn.borrow_mut(), 1, &hash_json));
+    // pool.execute(|| one());
+  
+//     let mut conn = connect();
+//     init_table(conn.borrow_mut());
 
-    hash_json = next_block(hash_json, conn.borrow_mut());
-    println!("{}", save_block(conn.borrow_mut(), 2, &hash_json));
+//     let hash_json = first_block();
+//     save_block(conn.borrow_mut(), 1, &hash_json);
 
-    hash_json = next_block(hash_json, conn.borrow_mut());
-    println!("{}", save_block(conn.borrow_mut(), 3, &hash_json));
+//     let hash_json = next_block(hash_json);
+//     save_block(conn.borrow_mut(), 2, &hash_json);
 
-    hash_json = next_block(hash_json, conn.borrow_mut());
-    println!("{}", save_block(conn.borrow_mut(), 4, &hash_json));
+//     let hash_json = next_block(hash_json);
+//     save_block(conn.borrow_mut(), 3, &hash_json);
 
-    hash_json = next_block(hash_json, conn.borrow_mut());
-    println!("{}", save_block(conn.borrow_mut(), 5, &hash_json));
-
-    search(conn.borrow_mut(), 0);
+//     search(conn.borrow_mut(),2);
 }
